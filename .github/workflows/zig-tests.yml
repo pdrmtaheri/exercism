@@ -2,28 +2,29 @@ name: Zig Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Zig
-      uses: mlugg/setup-zig@v1
-      with:
-        version: 0.13.0
+      - uses: actions/checkout@v4
 
-    - name: Run tests
-      run: |
-        cd zig
-        for test_file in */test_*.zig; do
-          if [ -f "$test_file" ]; then
-            echo "Running tests in $test_file"
-            cd "$(dirname "$test_file")"
-            zig test "$(basename "$test_file")"
-            cd ..
-          fi
-        done 
+      - name: Set up Zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.13.0
+
+      - name: Run tests
+        run: |
+          pushd zig > /dev/null
+          for test_file in */test_*.zig; do
+            if [ -f "$test_file" ]; then
+              echo "Running tests in $test_file"
+              pushd "$(dirname "$test_file")" > /dev/null
+              zig test "$(basename "$test_file")"
+              popd > /dev/null
+            fi
+          done
+          popd > /dev/null
